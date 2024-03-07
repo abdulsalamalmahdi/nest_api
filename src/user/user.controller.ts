@@ -1,5 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { UserService } from './user.service';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { UserService } from './services/user.service';
+import { CreateUserDto } from './services/dtos/create-user.dto';
+import { User } from 'src/db/mongo/schemas/user.schema';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('/user')
 export class UserController {
@@ -9,9 +12,10 @@ export class UserController {
   getUser(): string {
     return this.userService.getHello();
   }
-
+  
+  @UseGuards(AuthGuard)
   @Post()
-  postUser(@Body() body: any)  {
-    console.log(body)
+ async postUser(@Body() body: CreateUserDto): Promise<User>  {
+    return await this.userService.create(body)
   }
 }
